@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Malzeme ve Yöntem Görselleştirme</title>
+    <style>
+        /* Varsayılan renk */
+        .method {
+            color: black;
+            transition: color 0.3s;
+        }
+
+        /* Hover durumunda renk değişimi */
+        .material:hover + .methods .method {
+            color: red; /* Yöntemlerin rengi değişiyor */
+        }
+
+        /* Aktif seçili yöntem */
+        .method.highlight {
+            color: blue;
+        }
+    </style>
+</head>
+<body>
+<h1>Excel Kesişim Görselleştirme</h1>
+<form method="post" enctype="multipart/form-data" action="/upload">
+    <input type="file" name="file" />
+    <button type="submit">Yükle</button>
+</form>
+<!-- Malzemeler ve yöntemleri içeren tablo -->
+<div>
+    <table border="1">
+        <thead>
+        <tr>
+            <th>Malzeme</th>
+            <th>Yöntemler</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="entry : ${data}">
+            <!-- Her malzeme satırına özel bir class ekliyoruz -->
+            <td class="material" th:text="${entry.key}"></td>
+            <td>
+                <!-- Yöntemler burada listeleniyor -->
+                <span class="methods">
+                            <span th:each="method : ${entry.value}" class="method" th:text="${method}"></span>
+                        </span>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<script>
+    // JavaScript ile dinamik renk değiştirme
+    document.querySelectorAll('.material').forEach(material => {
+        material.addEventListener('mouseover', function () {
+            // İlgili yöntemlere renk değişikliği uygula
+            const methods = this.parentElement.querySelectorAll('.method');
+            methods.forEach(method => {
+                method.classList.add('highlight');
+            });
+        });
+
+        material.addEventListener('mouseout', function () {
+            // Rengi eski haline getir
+            const methods = this.parentElement.querySelectorAll('.method');
+            methods.forEach(method => {
+                method.classList.remove('highlight');
+            });
+        });
+    });
+</script>
+</body>
+</html>

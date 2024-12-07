@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Malzeme ve Yöntem Görselleştirme</title>
+</head>
+<body>
+<h1>Excel Kesişim Görselleştirme</h1>
+<form method="post" enctype="multipart/form-data" action="/upload">
+    <input type="file" name="file" />
+    <button type="submit">Yükle</button>
+</form>
+
+<div th:if="${data}">
+    <h2>Kesişim Sonuçları</h2>
+    <table border="1">
+        <thead>
+        <tr>
+            <th>Malzeme</th>
+            <th>Uygun Yöntemler</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="entry : ${data}">
+            <td th:text="${entry.key}"></td>
+            <td th:text="${entry.value}"></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<div th:if="${error}">
+    <p th:text="${error}" style="color:red;"></p>
+</div>
+</body>
+</html>
