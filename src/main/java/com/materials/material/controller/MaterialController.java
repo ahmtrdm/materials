@@ -1,16 +1,16 @@
 package com.materials.material.controller;
 
+
+import com.materials.material.model.ExcelData;
 import com.materials.material.service.ExcelService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Controller
@@ -20,41 +20,45 @@ public class MaterialController {
     private ExcelService excelService;
 
     @GetMapping("/")
-    public String index(Model model) {
-        // Boş bir model göndererek başlangıç sayfasını göster
-        model.addAttribute("materials", new HashMap<>());
-        model.addAttribute("methods", new ArrayList<>());
+    public String home(Model model) {
+        // Example data
+        Map<String, Map<String, List<String>>> intersections = Map.of(
+                "key1", Map.of("method1", List.of("value1", "value2")),
+                "key2", Map.of("method1", List.of("value3", "value4"))
+        );
 
-        return "index.html";
+        String method = "method1";
+
+        // Process the data
+        List<String> photoIds = intersections.values().stream()
+                .filter(map -> map.containsKey(method))
+                .flatMap(map -> map.get(method).stream())
+                .collect(Collectors.toList());
+
+        // Join into a comma-separated string
+        String photoIdsString = String.join(",", photoIds);
+
+        // Add the result to the model
+        model.addAttribute("photoIds", photoIdsString);
+        return "index"; // Thymeleaf template name
     }
 
     @PostMapping("/upload")
-    public String uploadExcel(@RequestParam("file") MultipartFile file, Model model) {
+    public String uploadFile(@RequestParam("file") MultipartFile file, Model model) {
         try {
-            // Excel verisini okuyup malzeme-yöntem ilişkilerini alıyoruz
-            Map<String, List<String>> materials = excelService.readExcel(file.getInputStream());
-
-            // Tüm yöntemlerin benzersiz bir listesini çıkar
-            Set<String> methods = materials.values()
-                    .stream()
-                    .flatMap(Collection::stream)
-                    .map(String::trim) // Boşlukları temizle
-                    .collect(Collectors.toSet());
-
-            Map<String, String> joinedMaterials = materials.entrySet().stream()
-                    .collect(Collectors.toMap(
-                            Map.Entry::getKey,
-                            entry -> String.join(",", entry.getValue())
-                    ));
-            model.addAttribute("materials", joinedMaterials);
-            // Malzeme ve yöntem listesini modele ekle
-            //model.addAttribute("materials", materials); // Anahtar ve değerlerin tam ilişkisi gönderiliyor
-            model.addAttribute("methods", methods); // Tüm yöntemlerin benzersiz listesi
-
-        } catch (IOException e) {
-            model.addAttribute("error", "Dosya okunurken bir hata oluştu.");
+            ExcelData data = excelService.processExcel(file);
+            model.addAttribute("materials", data.getMaterials());
+            model.addAttribute("methods", data.getMethods());
+            model.addAttribute("intersections", data.getIntersections());
+            model.addAttribute("photos", data.getPhotoMap());
+            System.out.println("materials: " + data.getMaterials());
+            System.out.println("methods: " + data.getMethods());
+            System.out.println("intersections: " + data.getIntersections());
+            System.out.println("photos: " + data.getPhotoMap());
+        } catch (Exception e) {
+            model.addAttribute("error", "Error processing file: " + e.getMessage());
         }
-
-        return "index.html"; // Aynı sayfayı döndür
+        return "index";
     }
 }
+

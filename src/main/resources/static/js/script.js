@@ -1,50 +1,42 @@
 document.addEventListener("DOMContentLoaded", function () {
     const materials = document.querySelectorAll('.material-item');
-    let activeMaterial = null; // Aktif malzemeyi takip etmek için
+    const methods = document.querySelectorAll('.method-item');
+    const photos = document.querySelectorAll('.photo-item');
+    let activeMaterial = null;
 
+    // Malzemeye tıklama
     materials.forEach(material => {
         material.addEventListener('click', function () {
-            // Önceki tıklamada işaretlenen yöntemlerin rengini sıfırla
-            if (activeMaterial) {
-                const previousMethodIds = activeMaterial.getAttribute('data-methods')
-                    .split(',')
-                    .map(id => id.trim().replaceAll(' ', ''));
-                previousMethodIds.forEach(id => {
-                    const previousMethodElement = document.getElementById(`method-${id}`);
-                    if (previousMethodElement) {
-                        previousMethodElement.classList.remove('highlight');
-                    }
-                });
-            }
+            // Önceki vurguları temizle
+            methods.forEach(method => method.classList.remove('highlight'));
+            photos.forEach(photo => photo.classList.remove('highlight'));
 
-            // Yeni tıklanan malzemeyi aktif olarak işaretle
+            // Aktif malzemeyi güncelle
             activeMaterial = this;
 
-            const methodIds = this.getAttribute('data-methods')
-                .split(',')
-                .map(id => id.trim().replaceAll(' ', ''));
+            // İlişkili yöntemleri vurgula
+            const relatedMethods = this.getAttribute('data-methods').split(',');
+            relatedMethods.forEach(methodId => {
+                const method = document.querySelector(`[data-method-id="${methodId.trim()}"]`);
+                if (method) method.classList.add('highlight');
+            });
+        });
+    });
 
-            // İlgili yöntemlere 'highlight' sınıfını ekle
-            methodIds.forEach(id => {
-                const methodElement = document.getElementById(`method-${id}`);
-                if (methodElement) {
-                    methodElement.classList.add('highlight');
-                }
+    // Yönteme tıklama
+    methods.forEach(method => {
+        method.addEventListener('click', function () {
+            // Önceki fotoğraf vurgularını temizle
+            photos.forEach(photo => photo.classList.remove('highlight'));
+
+            // İlişkili fotoğrafları vurgula
+            const relatedPhotos = this.getAttribute('data-photo-ids').split(',');
+            relatedPhotos.forEach(photoId => {
+                const photo = document.querySelector(`[data-photo-id="${photoId.trim()}"]`);
+                if (photo) photo.classList.add('highlight');
             });
         });
     });
 });
 
-material.addEventListener('mouseover', function () {
-    const methodIds = this.getAttribute('data-methods').split(',');
-    console.log('Hovered Material:', this.textContent); // Hangi malzeme seçiliyor?
-    console.log('Method IDs:', methodIds); // IDs doğru geliyor mu?
 
-    methodIds.forEach(id => {
-        const methodElement = document.getElementById(`method-${id}`);
-        console.log('Method Element:', methodElement); // Hangi yöntemler bulunuyor?
-        if (methodElement) {
-            methodElement.classList.add('highlight');
-        }
-    });
-});

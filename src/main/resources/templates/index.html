@@ -1,81 +1,84 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<script src="/js/script.js"></script>
+<html xmlns:th="http://www.thymeleaf.org" lang="">
 <head>
-    <title>Malzeme ve Yöntem Görselleştirme</title>
+    <title>Material UI</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-        }
-
-        .materials, .methods {
+        .materials, .methods, .photos {
             display: inline-block;
             vertical-align: top;
             margin: 20px;
         }
 
-        .materials {
-            width: 40%;
-        }
-
-        .methods {
-            width: 40%;
-        }
-
-        .material-item {
-            padding: 10px;
-            margin: 5px;
-            border: 1px solid #ccc;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-
-        .material-item:hover {
-            background-color: #f0f0f0;
-        }
-
-        .method-item {
-            padding: 10px;
-            margin: 5px;
-            border: 1px solid #ccc;
-            color: black;
-            transition: color 0.3s;
-        }
-
-        .method-item.highlight {
-            color: #7f7e1d; /* Renk değişimi */
-            font-weight: bold; /* Kalın yazı */
-            background-color: #ffe0e0; /* Arka plan rengi */
-            transition: color 0.3s, background-color 0.3s; /* Animasyon */
+        .highlight {
+            background-color: yellow;
         }
     </style>
 </head>
 <body>
-<h1>Malzeme ve Yöntem Görselleştirme</h1>
-
+<h1>Materials Selector</h1>
 <form method="post" enctype="multipart/form-data" action="/upload">
-    <input type="file" name="file" />
+    <input type="file" name="file"/>
     <button type="submit">Yükle</button>
 </form>
 
 <div class="materials">
-    <h2>Malzemeler</h2>
-    <div th:each="entry : ${materials.entrySet()}"
-         class="material-item"
-         th:data-methods="${entry.value}"
-         th:text="${entry.key}"></div>
+    <h2>Materials</h2>
+    <ul>
+        <li th:each="material : ${materials}"
+            th:text="${material}"
+            onclick="selectMaterial(this.textContent)"></li>
+    </ul>
 </div>
-
 
 <div class="methods">
-    <h2>Yöntemler</h2>
-    <div th:each="method : ${methods}"
-         class="method-item"
-         th:id="'method-' + ${method.replaceAll(' ', '').replaceAll(',', '')}"
-    th:text="${method}"></div>
+    <h2>Methods</h2>
+    <ul id="methods">
+        <li th:each="method : ${methods}"
+            th:text="${method}"
+            onclick="selectMethod(this.textContent)"></li>
+    </ul>
 </div>
 
+<div class="photos">
+    <h2>Photos</h2>
+    <ul id="photos">
+        <li th:each="photo : ${photos}"
+            th:text="${photo.value}"></li>
+    </ul>
+</div>
 
+<script>
+    function selectMaterial(material) {
+        const xhr = new XMLHttpRequest();
+        xhr.open("GET", `/filter-methods?material=${encodeURIComponent(material)}`);
+        xhr.onload = function () {
+            if (xhr.status === 200) {
+                document.querySelector('#methods').innerHTML = xhr.responseText;
+            } else {
+                console.error("Failed to load methods:", xhr.status, xhr.statusText);
+            }
+        };
+        xhr.onerror = function () {
+            console.error("An error occurred while loading methods.");
+        };
+        xhr.send();
+    }
 
+    function selectMethod(method) {
+        const xhr = new XMLHttpRequest();
+        xhr.open("GET", `/filter-photos?method=${encodeURIComponent(method)}`);
+        xhr.onload = function () {
+            if (xhr.status === 200) {
+                document.querySelector('#photos').innerHTML = xhr.responseText;
+            } else {
+                console.error("Failed to load photos:", xhr.status, xhr.statusText);
+            }
+        };
+        xhr.onerror = function () {
+            console.error("An error occurred while loading photos.");
+        };
+        xhr.send();
+    }
+</script>
 </body>
 </html>

@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<script src="/js/script.js"></script>
+<head>
+    <title>Malzeme ve Yöntem Görselleştirme</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        .materials, .methods {
+            display: inline-block;
+            vertical-align: top;
+            margin: 20px;
+        }
+
+        .materials {
+            width: 40%;
+        }
+
+        .methods {
+            width: 40%;
+        }
+
+        .material-item {
+            padding: 10px;
+            margin: 5px;
+            border: 1px solid #ccc;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .material-item:hover {
+            background-color: #f0f0f0;
+        }
+
+        .method-item {
+            padding: 10px;
+            margin: 5px;
+            border: 1px solid #ccc;
+            color: black;
+            transition: color 0.3s;
+        }
+
+        .method-item.highlight {
+            color: #7f7e1d; /* Renk değişimi */
+            font-weight: bold; /* Kalın yazı */
+            background-color: #ffe0e0; /* Arka plan rengi */
+            transition: color 0.3s, background-color 0.3s; /* Animasyon */
+        }
+        .image-item {
+            width: 100px;
+            height: 100px;
+            background-size: cover;
+            display: inline-block;
+            margin: 5px;
+            border: 2px solid transparent;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        .image-item.highlight {
+            border-color: red;
+            box-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+        }
+
+    </style>
+</head>
+<body>
+<h1>Malzeme ve Yöntem Görselleştirme</h1>
+
+<form method="post" enctype="multipart/form-data" action="/upload">
+    <input type="file" name="file" />
+    <button type="submit">Yükle</button>
+</form>
+
+<div class="materials">
+    <h2>Malzemeler</h2>
+    <div th:if="${materialMethodMap != null && materialMethodMap.containsKey(method)}"
+         class="material-item"
+         th:data-methods="${entry.value}"
+         th:text="${entry.key}"></div>
+</div>
+
+
+<div th:each="method : ${methods}">
+    <div th:if="${methodImageMap.containsKey(method)}"
+         class="method-item"
+         th:id="'method-' + ${method.replaceAll(' ', '').replaceAll(',', '')}"
+         th:data-images="${methodImageMap[method]}"
+         th:text="${method}">
+    </div>
+</div>
+
+
+<div th:if="${images != null}">
+    <h2>Resimler</h2>
+    <div th:each="entry : ${images}"
+         class="image-item"
+         th:data-id="${entry.key}"
+         th:style="'background-image: url(' + ${entry.value} + ')'"
+         th:title="'ID: ' + ${entry.key}">
+    </div>
+</div>
+<div th:if="${images == null}">
+    <p>Görüntü verisi bulunamadı.</p>
+</div>
+
+</body>
+</html>
