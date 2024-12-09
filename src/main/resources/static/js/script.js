@@ -39,4 +39,42 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 
+function handleSelection(material, method = null) {
+    const endpoint = method ? "/filter-photos" : "/filter-methods";
+    const params = method
+        ? `material=${encodeURIComponent(material)}&method=${encodeURIComponent(method)}`
+        : `material=${encodeURIComponent(material)}`;
+
+    const xhr = new XMLHttpRequest();
+    xhr.open("GET", `${endpoint}?${params}`);
+    xhr.onload = function () {
+        if (xhr.status === 200) {
+            if (method) {
+                // Fotoğraf URL'lerini işleyip göstermek
+                const photoUrls = JSON.parse(xhr.responseText); // Yanıt bir JSON listesi
+                const photosContainer = document.querySelector('#photos');
+                photosContainer.innerHTML = ""; // Eski içerikleri temizle
+                photoUrls.forEach(url => {
+                    const img = document.createElement('img');
+                    img.src = url;
+                    img.alt = "Photo";
+                    img.style.width = "150px"; // Fotoğraf boyutunu belirlemek için
+                    img.style.margin = "10px";
+                    photosContainer.appendChild(img);
+                });
+            } else {
+                // Metotları güncellemek
+                document.querySelector('#methods').innerHTML = xhr.responseText;
+            }
+        } else {
+            console.error(`Failed to load ${method ? "photos" : "methods"}:`, xhr.status, xhr.statusText);
+        }
+    };
+    xhr.onerror = function () {
+        console.error(`An error occurred while loading ${method ? "photos" : "methods"}.`);
+    };
+    xhr.send();
+}
+
+
 

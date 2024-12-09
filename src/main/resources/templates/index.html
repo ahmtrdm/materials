@@ -12,14 +12,20 @@
         .highlight {
             background-color: yellow;
         }
+        img {
+            width: 150px;
+            margin: 10px;
+        }
     </style>
 </head>
 <body>
 <h1>Materials Selector</h1>
-<form method="post" enctype="multipart/form-data" action="/upload">
+<form method="post" enctype="multipart/form-data" action="/upload" onsubmit="reloadPageAfterUpload(event)">
     <input type="file" name="file"/>
-    <button type="submit">Yükle</button>
+    <button type="submit">Upload</button>
 </form>
+
+
 
 <div class="materials">
     <h2>Materials</h2>
@@ -42,12 +48,20 @@
 <div class="photos">
     <h2>Photos</h2>
     <ul id="photos">
-        <li th:each="photo : ${photos}"
-            th:text="${photo.value}"></li>
+        <li th:each="photo : ${photos}">
+            <img th:src="@{/photos/{photo}(photo=${photo})}" alt="Photo">
+        </li>
     </ul>
 </div>
 
+<!--<div id="photos">-->
+<!--    <h2>Photos</h2>-->
+<!--    <img th:each="photo : ${photos}"-->
+<!--         th:src="${photo}" alt="Photo">-->
+<!--</div>-->
+
 <script>
+
     function selectMaterial(material) {
         const xhr = new XMLHttpRequest();
         xhr.open("GET", `/filter-methods?material=${encodeURIComponent(material)}`);

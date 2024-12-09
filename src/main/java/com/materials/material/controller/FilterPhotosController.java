@@ -27,7 +27,15 @@ public class FilterPhotosController {
         for (String photoId : photoIds) {
             String photoName = photoMap.get(photoId);
             if (photoName != null) {
-                response.append("<li>").append(photoName).append("</li>");
+                //response.append("<li>").append("<img src=").append(photoName).append(">").append("</li>");
+                //response.append("<img src=").append(photoName).append(">");
+                //response.append("<li>").append("<img src=\"/photos/").append(photoName).append("\">").append("</li>");
+                response.append("<li>")
+                        .append("<img src=\"/photos/")
+                        .append(photoName) // Sadece dosya adı döndürülüyor
+                        .append("\" alt=\"Photo\">")
+                        .append("</li>");
+
             }
         }
 

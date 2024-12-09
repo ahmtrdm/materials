@@ -83,13 +83,14 @@ public class ExcelService {
         System.out.println("materials" + data.getMaterials());
         System.out.println("methods" + data.getMethods());
         System.out.println("intersections" + data.getIntersections());
+        System.out.println("photoMap" + data.getPhotoMap());
         for(Map.Entry<String, Map<String, List<String>>> entry : intersections.entrySet()) {
             System.out.println("intersections " + entry.getKey());
             Map<String, List<String>> intersection = entry.getValue();
             System.out.println("intersections " + intersection);
 
         }
-        System.out.println("photoMap" + data.getPhotoMap());
+
         return data;
 
     }
